@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_17",
+  "package": "cn.elytra.not_a_manual.anvil.mixin",
+  "client": [
+    "ForgeRuleAccessor",
+    "ScreenAccessor"
+  ]
+}

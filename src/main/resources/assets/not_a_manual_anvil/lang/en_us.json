@@ -1,0 +1,9 @@
+{
+  "not_a_manual_anvil.auto_anvil_button": "A",
+  "not_a_manual_anvil.auto_anvil.done": "DONE!",
+  "not_a_manual_anvil.auto_anvil.fail": "Failed: %s",
+  "not_a_manual_anvil.auto_anvil.fail.no_forging": "Put the item in first!",
+  "not_a_manual_anvil.auto_anvil.fail.no_forging_recipe": "Select the Forging Recipe first!",
+  "not_a_manual_anvil.auto_anvil.fail.not_hot_enough": "The item is not hot enough!",
+  "not_a_manual_anvil.auto_anvil.fail.reached_max_iteration": "Failed to reach the destination %s after %s iterations!"
+}

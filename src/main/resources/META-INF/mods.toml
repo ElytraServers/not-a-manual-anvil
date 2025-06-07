@@ -1,0 +1,33 @@
+modLoader = "javafml"
+loaderVersion = "[42,)"
+license = "MIT"
+issueTrackerURL = "https://github.com/ElytraServers/not-a-manual-anvil/issues"
+showAsResourcePack = false
+
+[[mods]]
+modId = "not_a_manual_anvil"
+version = "${version}"
+displayName = "Not A Manual Anvil"
+# updateJSONURL="minecraftforge.net/versions.json"
+# displayURL="minecraftforge.net"
+# logoFile="logo.png"
+credits = "Voila!"
+authors = "Taskeren"
+description = '''
+Not A Manual Anvil!
+'''
+displayTest = "IGNORE_ALL_VERSION"
+
+[[dependencies.not_a_manual_anvil]]
+modId = "forge"
+mandatory = true
+versionRange = "[42,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.not_a_manual_anvil]]
+modId = "tfc"
+mandatory = true
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
