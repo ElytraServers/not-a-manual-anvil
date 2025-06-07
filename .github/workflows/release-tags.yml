@@ -62,6 +62,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publishing
         uses: Kira-NT/mc-publish@v3.3
+        continue-on-error: true
         with:
           modrinth-id: q3inx5Il
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
