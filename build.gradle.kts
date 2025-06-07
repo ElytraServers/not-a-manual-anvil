@@ -6,6 +6,8 @@ plugins {
 	id("com.palantir.git-version") version "3.1.0"
 }
 
+val gitVersion: Closure<String> by extra
+
 group = "cn.taskeren"
 version = getCurrentVersion()
 
@@ -79,15 +81,15 @@ tasks.processResources {
 	}
 }
 
-val gitVersion: Closure<String> by extra
-
 fun getCurrentVersion(): String {
 	val envVersion = System.getenv("VERSION")
 	if(envVersion != null) return envVersion
 
 	return try {
 		gitVersion()
-	} catch(_: Exception) {
+	} catch(e: Exception) {
+		println("Failed to get git version: ")
+		e.printStackTrace()
 		"NO-GIT-TAG-SET"
 	}
 }
