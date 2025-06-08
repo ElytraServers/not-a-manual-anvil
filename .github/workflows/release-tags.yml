@@ -66,6 +66,8 @@ jobs:
         with:
           modrinth-id: q3inx5Il
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: 1282484
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           game-versions: |
             1.20.1
           dependencies: |
