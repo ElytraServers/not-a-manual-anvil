@@ -1,8 +1,11 @@
 package cn.elytra.not_a_manual.anvil.util;
 
 import cn.elytra.not_a_manual.anvil.mixin.ForgeRuleAccessor;
+import net.dries007.tfc.common.capabilities.VesselLike;
 import net.dries007.tfc.common.capabilities.forge.ForgeRule;
 import net.dries007.tfc.common.capabilities.forge.ForgeStep;
+import net.dries007.tfc.common.items.VesselItem;
+import net.minecraftforge.items.ItemStackHandler;
 
 import java.lang.reflect.Field;
 import java.util.NoSuchElementException;
@@ -15,21 +18,33 @@ public class TFCReflect {
 
     private static final Class<?> FORGE_RULE_ORDER_CLASS;
 
+    private static final Class<?> VESSEL_ITEM_VESSEL_CAPABILITY_CLASS;
+    private static final Field VESSEL_CAPABILITY_INVENTORY_FIELD;
+    private static final Field VESSEL_CAPABILITY_CAPACITY_FIELD;
+
     private static Integer valueOrderAny;
 
     static {
         try {
             {
-                Field f = ForgeRule.class.getDeclaredField("order");
-                f.setAccessible(true);
-                FORGE_RULES_ORDER_FIELD = f;
+                FORGE_RULES_ORDER_FIELD = ForgeRule.class.getDeclaredField("order");
+                FORGE_RULES_ORDER_FIELD.setAccessible(true);
             }
 
             {
                 FORGE_RULE_ORDER_CLASS = Class.forName(ForgeRule.class.getCanonicalName() + "$Order");
-                Field f = FORGE_RULE_ORDER_CLASS.getDeclaredField("y");
-                f.setAccessible(true);
-                FORGE_RULE_ORDER_Y_FIELD = f;
+                FORGE_RULE_ORDER_Y_FIELD = FORGE_RULE_ORDER_CLASS.getDeclaredField("y");
+                FORGE_RULE_ORDER_Y_FIELD.setAccessible(true);
+            }
+
+            {
+                VESSEL_ITEM_VESSEL_CAPABILITY_CLASS = Class.forName(VesselItem.class.getCanonicalName() + "$VesselCapability");
+
+                VESSEL_CAPABILITY_INVENTORY_FIELD = VESSEL_ITEM_VESSEL_CAPABILITY_CLASS.getDeclaredField("inventory");
+                VESSEL_CAPABILITY_INVENTORY_FIELD.setAccessible(true);
+
+                VESSEL_CAPABILITY_CAPACITY_FIELD = VESSEL_ITEM_VESSEL_CAPABILITY_CLASS.getDeclaredField("capacity");
+                VESSEL_CAPABILITY_CAPACITY_FIELD.setAccessible(true);
             }
         } catch(Throwable e) {
             throw new RuntimeException(e);
@@ -71,5 +86,21 @@ public class TFCReflect {
 
     public static int getStepValueFromForgeRule(ForgeRule forgeRule) {
         return getForgeStepFromForgeRule(forgeRule).step();
+    }
+
+    public static ItemStackHandler getVesselItemInventory(VesselLike vesselLike) {
+        try {
+            return (ItemStackHandler) VESSEL_CAPABILITY_INVENTORY_FIELD.get(vesselLike);
+        } catch(IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int getVesselItemCapacity(VesselLike vesselLike) {
+        try {
+            return VESSEL_CAPABILITY_CAPACITY_FIELD.getInt(vesselLike);
+        } catch(IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
