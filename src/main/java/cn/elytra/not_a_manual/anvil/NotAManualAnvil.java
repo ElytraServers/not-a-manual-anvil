@@ -124,7 +124,7 @@ public class NotAManualAnvil {
 
                     MutableComponent heatTooltip = TFCConfig.CLIENT.heatTooltipStyle.get().formatColored(maxTemperature);
 
-                    tooltips.add(Either.left(Component.literal("Will be alloyed into: ").withStyle(ChatFormatting.DARK_GREEN)));
+                    tooltips.add(Either.left(Component.translatable("not_a_manual_anvil.alloy_predict.title").withStyle(ChatFormatting.DARK_GREEN)));
                     tooltips.add(Either.left(Component.translatable("tfc.tooltip.item_melts_into", alloy.getAmount(), alloy.getResult().getDisplayName(), heatTooltip)));
                 }
             }

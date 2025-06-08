@@ -5,5 +5,6 @@
   "not_a_manual_anvil.auto_anvil.fail.no_forging": "先把物品放入！",
   "not_a_manual_anvil.auto_anvil.fail.no_forging_recipe": "先选择锻造配方！",
   "not_a_manual_anvil.auto_anvil.fail.not_hot_enough": "物品不够热！",
-  "not_a_manual_anvil.auto_anvil.fail.reached_max_iteration": "在%2$s次尝试后无法达到目标%1$s！"
+  "not_a_manual_anvil.auto_anvil.fail.reached_max_iteration": "在%2$s次尝试后无法达到目标%1$s！",
+  "not_a_manual_anvil.alloy_predict.title": "将混合为："
 }
