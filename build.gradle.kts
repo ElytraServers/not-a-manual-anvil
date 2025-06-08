@@ -4,6 +4,8 @@ plugins {
 	java
 	id("xyz.wagyourtail.unimined") version "1.2.6"
 	id("com.palantir.git-version") version "3.1.0"
+
+	id("com.diffplug.spotless") version "7.0.4"
 }
 
 val gitVersion: Closure<String> by extra
@@ -91,5 +93,21 @@ fun getCurrentVersion(): String {
 		println("Failed to get git version: ")
 		e.printStackTrace()
 		"NO-GIT-TAG-SET"
+	}
+}
+
+spotless {
+	java {
+		toggleOffOn()
+
+		importOrder()
+		removeUnusedImports()
+
+		val eclipseFormatPreference = file("gradle/spotless.eclipseformat.xml")
+		if(!eclipseFormatPreference.exists()) {
+			error("Eclipse format preference file not found: ${eclipseFormatPreference.absolutePath}")
+		}
+
+		eclipse("4.19.0").configFile(eclipseFormatPreference)
 	}
 }

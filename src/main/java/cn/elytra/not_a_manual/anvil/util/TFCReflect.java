@@ -1,14 +1,13 @@
 package cn.elytra.not_a_manual.anvil.util;
 
 import cn.elytra.not_a_manual.anvil.mixin.ForgeRuleAccessor;
+import java.lang.reflect.Field;
+import java.util.NoSuchElementException;
 import net.dries007.tfc.common.capabilities.VesselLike;
 import net.dries007.tfc.common.capabilities.forge.ForgeRule;
 import net.dries007.tfc.common.capabilities.forge.ForgeStep;
 import net.dries007.tfc.common.items.VesselItem;
 import net.minecraftforge.items.ItemStackHandler;
-
-import java.lang.reflect.Field;
-import java.util.NoSuchElementException;
 
 @SuppressWarnings("unused")
 public class TFCReflect {
@@ -38,7 +37,8 @@ public class TFCReflect {
             }
 
             {
-                VESSEL_ITEM_VESSEL_CAPABILITY_CLASS = Class.forName(VesselItem.class.getCanonicalName() + "$VesselCapability");
+                VESSEL_ITEM_VESSEL_CAPABILITY_CLASS = Class
+                    .forName(VesselItem.class.getCanonicalName() + "$VesselCapability");
 
                 VESSEL_CAPABILITY_INVENTORY_FIELD = VESSEL_ITEM_VESSEL_CAPABILITY_CLASS.getDeclaredField("inventory");
                 VESSEL_CAPABILITY_INVENTORY_FIELD.setAccessible(true);
@@ -46,7 +46,7 @@ public class TFCReflect {
                 VESSEL_CAPABILITY_CAPACITY_FIELD = VESSEL_ITEM_VESSEL_CAPABILITY_CLASS.getDeclaredField("capacity");
                 VESSEL_CAPABILITY_CAPACITY_FIELD.setAccessible(true);
             }
-        } catch(Throwable e) {
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
@@ -55,26 +55,27 @@ public class TFCReflect {
         try {
             Object order = FORGE_RULES_ORDER_FIELD.get(rule);
             return FORGE_RULE_ORDER_Y_FIELD.getInt(order);
-        } catch(IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
     private static int getOrderAnyValueInternal() {
         try {
-            for(Object enumConstant : FORGE_RULE_ORDER_CLASS.getEnumConstants()) {
-                if(((Enum<?>) enumConstant).name().equals("ANY")) {
+            for (Object enumConstant : FORGE_RULE_ORDER_CLASS.getEnumConstants()) {
+                if (((Enum<?>) enumConstant).name()
+                    .equals("ANY")) {
                     return FORGE_RULE_ORDER_Y_FIELD.getInt(enumConstant);
                 }
             }
             throw new NoSuchElementException("ANY");
-        } catch(Throwable e) {
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
     public static boolean isOrderAny(ForgeRule rule) {
-        if(valueOrderAny == null) {
+        if (valueOrderAny == null) {
             valueOrderAny = getOrderAnyValueInternal();
         }
         return getOrderValue(rule) == valueOrderAny;
@@ -91,7 +92,7 @@ public class TFCReflect {
     public static ItemStackHandler getVesselItemInventory(VesselLike vesselLike) {
         try {
             return (ItemStackHandler) VESSEL_CAPABILITY_INVENTORY_FIELD.get(vesselLike);
-        } catch(IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -99,7 +100,7 @@ public class TFCReflect {
     public static int getVesselItemCapacity(VesselLike vesselLike) {
         try {
             return VESSEL_CAPABILITY_CAPACITY_FIELD.getInt(vesselLike);
-        } catch(IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }

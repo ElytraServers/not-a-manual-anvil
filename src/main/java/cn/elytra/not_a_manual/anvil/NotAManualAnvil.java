@@ -3,6 +3,7 @@ package cn.elytra.not_a_manual.anvil;
 import cn.elytra.not_a_manual.anvil.mixin.ScreenAccessor;
 import cn.elytra.not_a_manual.anvil.util.TFCReflect;
 import com.mojang.datafixers.util.Either;
+import java.util.List;
 import net.dries007.tfc.client.screen.AnvilScreen;
 import net.dries007.tfc.common.capabilities.VesselLike;
 import net.dries007.tfc.common.items.VesselItem;
@@ -30,8 +31,6 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 @Mod(NotAManualAnvil.MOD_ID)
 public class NotAManualAnvil {
 
@@ -52,7 +51,7 @@ public class NotAManualAnvil {
         AutoAnvilExecutor aae = new AutoAnvilExecutor(screen);
         try {
             aae.workout();
-        } catch(Exception e) {
+        } catch (Exception e) {
             trySendMessageToLocalPlayer(Component.translatable("not_a_manual_anvil.auto_anvil.fail", e.getMessage()));
         }
     }
@@ -64,7 +63,7 @@ public class NotAManualAnvil {
      */
     public static void trySendMessageToLocalPlayer(Component message) {
         LocalPlayer player = Minecraft.getInstance().player;
-        if(player != null) {
+        if (player != null) {
             player.sendSystemMessage(message);
         }
     }
@@ -74,12 +73,14 @@ public class NotAManualAnvil {
 
         @SubscribeEvent
         public static void onScreenInit(ScreenEvent.Init event) {
-            if(event.getScreen() instanceof AnvilScreen anvilScreen) {
-                Button button = Button.builder(Component.translatable("not_a_manual_anvil.auto_anvil_button"),
-                                (button1) -> NotAManualAnvil.onAutoAnvilButtonClicked(anvilScreen))
-                        .pos(anvilScreen.getGuiLeft() + 10, anvilScreen.getGuiTop() + 10)
-                        .size(16, 16)
-                        .build();
+            if (event.getScreen() instanceof AnvilScreen anvilScreen) {
+                Button button = Button
+                    .builder(
+                        Component.translatable("not_a_manual_anvil.auto_anvil_button"),
+                        (button1) -> NotAManualAnvil.onAutoAnvilButtonClicked(anvilScreen))
+                    .pos(anvilScreen.getGuiLeft() + 10, anvilScreen.getGuiTop() + 10)
+                    .size(16, 16)
+                    .build();
                 ((ScreenAccessor) anvilScreen).invokeAddRenderableWidget(button);
             }
         }
@@ -89,13 +90,13 @@ public class NotAManualAnvil {
             ItemStack itemStack = event.getItemStack();
             List<Either<FormattedText, TooltipComponent>> tooltips = event.getTooltipElements();
 
-            if(itemStack.getItem() instanceof VesselItem) {
+            if (itemStack.getItem() instanceof VesselItem) {
                 VesselLike vesselLike = VesselLike.get(itemStack);
-                if(vesselLike == null) {
+                if (vesselLike == null) {
                     return;
                 }
 
-                if(vesselLike.mode() == VesselLike.Mode.INVENTORY) {
+                if (vesselLike.mode() == VesselLike.Mode.INVENTORY) {
                     ItemStackHandler inventory = TFCReflect.getVesselItemInventory(vesselLike);
 
                     int capacity = TFCReflect.getVesselItemCapacity(vesselLike);
@@ -103,29 +104,40 @@ public class NotAManualAnvil {
 
                     ItemStackInventory inventoryForRecipes = new ItemStackInventory();
                     float maxTemperature = 0.0F;
-                    for(int i = 0; i < 4; i++) {
+                    for (int i = 0; i < 4; i++) {
                         ItemStack toMelt = inventory.getStackInSlot(i);
                         inventoryForRecipes.setStack(toMelt.copy());
                         HeatingRecipe recipe = HeatingRecipe.getRecipe(toMelt);
-                        if(recipe != null) {
+                        if (recipe != null) {
                             FluidStack melted = recipe.assembleFluid(inventoryForRecipes);
-                            if(!melted.isEmpty()) {
+                            if (!melted.isEmpty()) {
                                 melted.setAmount(melted.getAmount() * toMelt.getCount());
                             }
-                            if(recipe.getTemperature() > maxTemperature) {
+                            if (recipe.getTemperature() > maxTemperature) {
                                 maxTemperature = recipe.getTemperature();
                             }
                             Metal metal = Metal.get(melted.getFluid());
-                            if(metal != null) {
+                            if (metal != null) {
                                 alloy.add(metal, melted.getAmount(), false);
                             }
                         }
                     }
 
-                    MutableComponent heatTooltip = TFCConfig.CLIENT.heatTooltipStyle.get().formatColored(maxTemperature);
+                    MutableComponent heatTooltip = TFCConfig.CLIENT.heatTooltipStyle.get()
+                        .formatColored(maxTemperature);
 
-                    tooltips.add(Either.left(Component.translatable("not_a_manual_anvil.alloy_predict.title").withStyle(ChatFormatting.DARK_GREEN)));
-                    tooltips.add(Either.left(Component.translatable("tfc.tooltip.item_melts_into", alloy.getAmount(), alloy.getResult().getDisplayName(), heatTooltip)));
+                    tooltips.add(
+                        Either.left(
+                            Component.translatable("not_a_manual_anvil.alloy_predict.title")
+                                .withStyle(ChatFormatting.DARK_GREEN)));
+                    tooltips.add(
+                        Either.left(
+                            Component.translatable(
+                                "tfc.tooltip.item_melts_into",
+                                alloy.getAmount(),
+                                alloy.getResult()
+                                    .getDisplayName(),
+                                heatTooltip)));
                 }
             }
         }

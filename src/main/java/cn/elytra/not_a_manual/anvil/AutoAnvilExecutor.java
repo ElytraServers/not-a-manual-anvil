@@ -5,6 +5,9 @@ import cn.elytra.not_a_manual.anvil.util.TFCReflect;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Optional;
 import net.dries007.tfc.client.screen.AnvilScreen;
 import net.dries007.tfc.common.capabilities.forge.ForgeRule;
 import net.dries007.tfc.common.capabilities.forge.ForgeStep;
@@ -21,10 +24,6 @@ import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
-
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Optional;
 
 public class AutoAnvilExecutor {
 
@@ -51,13 +50,14 @@ public class AutoAnvilExecutor {
 
     @Nullable
     protected Forging getForging() {
-        return getAnvilContainer().getBlockEntity().getMainInputForging();
+        return getAnvilContainer().getBlockEntity()
+            .getMainInputForging();
     }
 
     @Nullable
     protected ForgeRule[] getForgeRules(@NotNull Forging forging) {
         AnvilRecipe recipe = forging.getRecipe(null);
-        if(recipe == null) {
+        if (recipe == null) {
             return null;
         }
         return recipe.getRules();
@@ -84,10 +84,11 @@ public class AutoAnvilExecutor {
      */
     protected ForgeStep getSelectedForgeStep(int current, int destination) {
         Optional<Pair<ForgeStep, Integer>> min = Arrays.stream(ForgeStep.values())
-                .map(fs -> Pair.of(fs, fs.step()))
-                .map(pair -> Pair.of(pair.left(), Math.abs(current + pair.right() - destination)))
-                .min(Comparator.comparingInt(Pair::right));
-        return min.orElseThrow().left();
+            .map(fs -> Pair.of(fs, fs.step()))
+            .map(pair -> Pair.of(pair.left(), Math.abs(current + pair.right() - destination)))
+            .min(Comparator.comparingInt(Pair::right));
+        return min.orElseThrow()
+            .left();
     }
 
     /**
@@ -119,7 +120,8 @@ public class AutoAnvilExecutor {
      * @return {@code true} if the working item has enough heat to work.
      */
     protected boolean isEnoughHeatToWork() {
-        ItemStack stack = getAnvilContainer().getItems().get(0);
+        ItemStack stack = getAnvilContainer().getItems()
+            .get(0);
         return isEnoughHeatToWork(stack);
     }
 
@@ -133,13 +135,13 @@ public class AutoAnvilExecutor {
      */
     public Result<Component> moveTo(@Range(from = 0, to = 150) int destination) {
         Forging forging = getForging();
-        if(forging == null) {
+        if (forging == null) {
             return Result.fail(Component.translatable("not_a_manual_anvil.auto_anvil.fail.no_forging"));
         }
 
         int current = forging.getWork();
-        for(int i = 0; i < LOOP_LIMIT && current != destination; i++) {
-            if(!isEnoughHeatToWork()) {
+        for (int i = 0; i < LOOP_LIMIT && current != destination; i++) {
+            if (!isEnoughHeatToWork()) {
                 return Result.fail(Component.translatable("not_a_manual_anvil.auto_anvil.fail.not_hot_enough"));
             }
 
@@ -147,8 +149,10 @@ public class AutoAnvilExecutor {
             doForgeStep(step);
             current += step.step();
         }
-        if(current != destination) {
-            return Result.fail(Component.translatable("not_a_manual_anvil.auto_anvil.fail.reached_max_iteration", destination, LOOP_LIMIT));
+        if (current != destination) {
+            return Result.fail(
+                Component
+                    .translatable("not_a_manual_anvil.auto_anvil.fail.reached_max_iteration", destination, LOOP_LIMIT));
         }
 
         return Result.ok();
@@ -159,14 +163,14 @@ public class AutoAnvilExecutor {
      */
     public void workout() {
         Forging forging = getForging();
-        if(forging == null) {
+        if (forging == null) {
             NotAManualAnvil.LOG.error("No forging found!");
             return;
         }
 
         Result<Component> result = internalWorkoutStepsBeforeRules(forging)
-                .then(() -> internalWorkoutFinalSteps(forging));
-        if(!result.success()) {
+            .then(() -> internalWorkoutFinalSteps(forging));
+        if (!result.success()) {
             NotAManualAnvil.trySendMessageToLocalPlayer(result.errorMessage());
         }
     }
@@ -177,13 +181,14 @@ public class AutoAnvilExecutor {
     @SuppressWarnings("unused") // for test purposes
     public void workoutBeforeRules() {
         Forging forging = getForging();
-        if(forging == null) {
-            NotAManualAnvil.trySendMessageToLocalPlayer(Component.translatable("not_a_manual_anvil.auto_anvil.fail.no_forging"));
+        if (forging == null) {
+            NotAManualAnvil
+                .trySendMessageToLocalPlayer(Component.translatable("not_a_manual_anvil.auto_anvil.fail.no_forging"));
             return;
         }
 
         Result<Component> result = internalWorkoutStepsBeforeRules(forging);
-        if(!result.success()) {
+        if (!result.success()) {
             NotAManualAnvil.LOG.error("Failed to workout before rules: {}", result.errorMessage());
             NotAManualAnvil.trySendMessageToLocalPlayer(result.errorMessage());
         }
@@ -198,11 +203,12 @@ public class AutoAnvilExecutor {
         int finalTarget = forging.getWorkTarget();
         // the target that the last operations have not been applied yet as they need to be applied by the rules
         ForgeRule[] rules = getForgeRules(forging);
-        if(rules == null) {
+        if (rules == null) {
             return moveTo(finalTarget);
         }
-        int targetBeforeLastOperations = finalTarget -
-                Arrays.stream(rules).mapToInt(TFCReflect::getStepValueFromForgeRule).sum();
+        int targetBeforeLastOperations = finalTarget - Arrays.stream(rules)
+            .mapToInt(TFCReflect::getStepValueFromForgeRule)
+            .sum();
         return moveTo(targetBeforeLastOperations);
     }
 
@@ -213,10 +219,10 @@ public class AutoAnvilExecutor {
      */
     protected Result<Component> internalWorkoutFinalSteps(@NotNull Forging forging) {
         AnvilRecipe recipe = forging.getRecipe(null);
-        if(recipe == null) {
+        if (recipe == null) {
             return Result.fail(Component.translatable("not_a_manual_anvil.auto_anvil.fail.no_forging_recipe"));
         }
-        for(ForgeStep step : getOrderedForgeRuleSteps(recipe.getRules())) {
+        for (ForgeStep step : getOrderedForgeRuleSteps(recipe.getRules())) {
             doForgeStep(step);
         }
         return Result.ok();
@@ -229,9 +235,10 @@ public class AutoAnvilExecutor {
      * @return the last forge steps to apply
      */
     protected static ForgeStep[] getOrderedForgeRuleSteps(ForgeRule[] rules) {
-        return Arrays.stream(rules).sorted(Comparator.comparingInt(AutoAnvilExecutor::getForgeRulePriority))
-                .map(TFCReflect::getForgeStepFromForgeRule)
-                .toArray(ForgeStep[]::new);
+        return Arrays.stream(rules)
+            .sorted(Comparator.comparingInt(AutoAnvilExecutor::getForgeRulePriority))
+            .map(TFCReflect::getForgeStepFromForgeRule)
+            .toArray(ForgeStep[]::new);
     }
 
     @SuppressWarnings("unused")
@@ -243,7 +250,7 @@ public class AutoAnvilExecutor {
      */
     protected static int getForgeRulePriority(ForgeRule rule) {
         int y = TFCReflect.getOrderValue(rule);
-        return switch(y) {
+        return switch (y) {
             case LAST -> 10;
             case THIRD_LAST -> -10;
             default -> 0;

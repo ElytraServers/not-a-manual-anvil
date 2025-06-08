@@ -1,5 +1,11 @@
 pluginManagement {
 	repositories {
+		mavenCentral()
+		gradlePluginPortal {
+			content {
+				excludeGroup("org.apache.logging.log4j")
+			}
+		}
 		maven {
 			url = uri("https://maven.wagyourtail.xyz/releases")
 		}
@@ -9,13 +15,6 @@ pluginManagement {
 		maven {
 			name = "SpongePowered Maven"
 			url = uri("https://repo.spongepowered.org/repository/maven-public/")
-		}
-		mavenCentral() // highly recommended, but not required
-		gradlePluginPortal {
-			content {
-				// this is not required either, unless jcenter goes down again, then it might fix things
-				excludeGroup("org.apache.logging.log4j")
-			}
 		}
 	}
 }
