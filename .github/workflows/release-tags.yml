@@ -37,29 +37,6 @@ jobs:
         run: chmod +x gradlew
       - name: Compile the mod
         run: ./gradlew --build-cache --info --stacktrace build
-      - name: Delete existing release
-        run: gh release delete --yes "${RELEASE_VERSION}"
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Release under current tag
-        run: |
-          PRERELEASE=""
-          if [[ "$SNAPSHOT" == "true" ]]; then
-            PRERELEASE="--prerelease"
-          fi
-          export "CHANGELOG_FILE=$(mktemp --suffix=.md)"
-          echo "CHANGELOG_FILE=${CHANGELOG_FILE}" >> $GITHUB_ENV
-          gh api --method POST -H "Accept: application/vnd.github+json" \
-            "/repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
-            -f tag_name="${RELEASE_VERSION}" \
-            --jq ".body" > "${CHANGELOG_FILE}"
-          cat "${CHANGELOG_FILE}"
-          gh release create "${RELEASE_VERSION}" -F "${CHANGELOG_FILE}" $PRERELEASE ./build/libs/*.jar
-        shell: bash
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publishing
         uses: Kira-NT/mc-publish@v3.3
         continue-on-error: true
@@ -68,7 +45,11 @@ jobs:
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
           curseforge-id: 1282484
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          github-generate-changelog: true
+          github-prerelease: ${{ env.SNAPSHOT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           game-versions: |
             1.20.1
           dependencies: |
             terrafirmacraft{modrinth:JaCEZUhg}{curseforge:302973}
+          fail-mode: skip
